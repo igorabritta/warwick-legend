@@ -54,6 +54,8 @@ public:
   std::vector<G4double>& GetNeutronyMom() { return neutronymom; }
   std::vector<G4double>& GetNeutronzMom() { return neutronzmom; }
   std::vector<G4double>& GetNeutronTime() { return neutrontime; }
+  std::vector<G4double>& GetNeutronEkin() { return neutronekin; }
+  std::vector<G4double>& GetNeutronID()   { return neutronid; }
   std::vector<G4int>&    GetNumberOfNeutronsInEvent()
   {
     return NumberOfNeutronsProducedInEvent;
@@ -345,7 +347,7 @@ public:
   void AddMuonyMom(G4double posy) { Muonymom.push_back(posy); }
   void AddMuonzMom(G4double posz) { Muonzmom.push_back(posz); }
 
-  void AddEkin(G4double kin) { ekin.push_back(kin); }
+  void AddEkin(G4double kin)         { ekin.push_back(kin); }
   void AddNeutronxLoc(G4double posx) { neutronxloc.push_back(posx); }
   void AddNeutronyLoc(G4double posy) { neutronyloc.push_back(posy); }
   void AddNeutronzLoc(G4double posz) { neutronzloc.push_back(posz); }
@@ -353,6 +355,8 @@ public:
   void AddNeutronyMom(G4double posy) { neutronymom.push_back(posy); }
   void AddNeutronzMom(G4double posz) { neutronzmom.push_back(posz); }
   void AddNeutronTime(G4double time) { neutrontime.push_back(time); }
+  void AddNeutronEkin(G4double ekin) { neutronekin.push_back(ekin); }
+  void AddNeutronID(G4double id)     { neutronid.push_back(id);     }
 
   void AddIndividualEnergyDeposition_Timing(G4double time)
   {
@@ -591,6 +595,8 @@ private:
   std::vector<G4double> neutronymom;
   std::vector<G4double> neutronzmom;
   std::vector<G4double> neutrontime;
+  std::vector<G4double> neutronekin;
+  std::vector<G4double> neutronid;
 
   // - redundant code for previously reading out the neutron track
   std::vector<G4double> out_neutron_track_x;

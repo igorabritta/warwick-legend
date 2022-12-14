@@ -54,6 +54,8 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       tmp_neutronXmom = tmp_vector.getX();
       tmp_neutronYmom = tmp_vector.getY();
       tmp_neutronZmom = tmp_vector.getZ();
+      tmp_neutronEkin = (aTrack->GetKineticEnergy() / eV);
+      tmp_neutronID   = (aTrack->GetTrackID());
     }  // readout of neutron production info
 
     // if all neutron info is readout, sent to output
@@ -66,6 +68,8 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
       fEventAction->AddNeutronyMom(tmp_neutronYmom);
       fEventAction->AddNeutronzMom(tmp_neutronZmom);
       fEventAction->AddNeutronTime(tmp_neutronTime);
+      fEventAction->AddNeutronEkin(tmp_neutronEkin);
+      fEventAction->AddNeutronID(tmp_neutronID);
     }
 
     // initial value for furthest position of neutron away from center (for testing, can

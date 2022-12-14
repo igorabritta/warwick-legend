@@ -76,6 +76,14 @@ void WLGDDetectorConstruction::DefineMaterials()
   auto* O  = new G4Element("Oxygen", "O", 8., 16.00 * g / mole);
   auto* Ca = new G4Element("Calcium", "Ca", 20., 40.08 * g / mole);
   auto* Mg = new G4Element("Magnesium", "Mg", 12., 24.31 * g / mole);
+  auto* Zn  = new G4Element("Zinc", "Zn", 30., 65.38 * g / mole);
+  auto* S  = new G4Element("Sulfur", "S", 16., 32.06 * g / mole);
+
+  //Creating ZnS
+  auto* ZnS = new G4Material("ZnS", 4.090 * g / cm3, 2);
+  ZnS->AddElement(Zn, 0.670942571);
+  ZnS->AddElement(S, 0.329057429);
+
 
   // Standard Rock definition, similar to Gran Sasso rock
   // with density from PDG report
@@ -120,6 +128,27 @@ void WLGDDetectorConstruction::DefineMaterials()
   auto* PolyEthylene = new G4Material("PolyEthylene", 0.95 * g / cm3, 2);
   PolyEthylene->AddElement(H, 0.142);
   PolyEthylene->AddElement(C, 0.857);
+
+  // Estimated using the number of elements per chain elements  (C_10 H_9)
+  auto* PVT = new G4Material("PVT", 1.023 * g / cm3, 2);
+  PVT->AddElement(H, 0.070216136);
+  PVT->AddElement(C, 0.929783864);
+
+  // Estimated using the number of elements per chain elements  (C_10 H_9)
+  auto* Styrene  = new G4Material("Styrene", 0.909 * g / cm3, 2);
+  Styrene ->AddElement(H, 0.077413961);
+  Styrene ->AddElement(C, 0.922586039);
+
+  // ZnS-Styrene
+  double   frac_ZnS = fFrac_ZnS;
+  auto* ZnSStyrene  = new G4Material("ZnSStyrene", 0.909 * g / cm3, 2);
+  ZnSStyrene ->AddMaterial(Styrene, 1-frac_ZnS);
+  ZnSStyrene ->AddMaterial(ZnS, frac_ZnS);
+
+  // ZnS-PVT
+  auto* ZnSPVT  = new G4Material("ZnSPVT", 1.023 * g / cm3, 2);
+  ZnSPVT ->AddMaterial(PVT, 1-frac_ZnS);
+  ZnSPVT ->AddMaterial(ZnS, frac_ZnS);
 
   G4Element* elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * g / mole);
   G4Element* elS  = new G4Element("Sulfur", "S", 16., 32.066 * g / mole);
@@ -553,6 +582,14 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     BoratedPETMat = G4Material::GetMaterial("PolyEthylene");
   if(fSetMaterial == "PMMA")
     BoratedPETMat = G4Material::GetMaterial("PMMA");
+  if(fSetMaterial == "PVT")
+    BoratedPETMat = G4Material::GetMaterial("PVT");
+  if(fSetMaterial == "Styrene")
+    BoratedPETMat = G4Material::GetMaterial("Styrene");
+  if(fSetMaterial == "ZnSStyrene")
+    BoratedPETMat = G4Material::GetMaterial("ZnSStyrene");
+  if(fSetMaterial == "ZnSPVT")
+    BoratedPETMat = G4Material::GetMaterial("PVT");
   auto* larMat /*_alt*/ = G4Material::GetMaterial("CombinedArXeHe3");
   // if(fXeConc != 0 || fHe3Conc != 0) BoratedPET
   larMat = CombinedArXeHe3;
@@ -591,7 +628,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
   if(fGeometryName == "baseline_large_reentrance_tube")
   {
-    vacgap     = 50.0;  
+    vacgap     = fCryostatVacgap;
   }
 
   if(fGeometryName == "baseline_smaller" || fGeometryName == "baseline_large_reentrance_tube_4m_cryo")
@@ -1146,6 +1183,21 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
   fGeLogical->SetVisAttributes(testVisAtt_Ge);
   fBoratedPETLogical_Tube->SetVisAttributes(testVisAtt4);
   fBoratedPETLogical_Box->SetVisAttributes(testVisAtt4);
+
+  // TO BE REMOVED - JUST A TEST
+  G4cout << "Geometry definitions: " << G4endl;
+  G4cout << "VacGap: " << vacgap << G4endl;
+  G4cout << "VacGap Radius: " << (cryrad - cryowall) << G4endl;
+  G4cout << "VacGap Height: " << (cryhheight - cryowall) << G4endl;
+
+  G4cout << "Outer Cryostat Radius: " << cryrad << G4endl;
+  G4cout << "Outer Cryostat Height: " << cryhheight << G4endl;
+
+  G4cout << "Inner Cryostat Radius: " << (cryrad - cryowall - vacgap) << G4endl;
+  G4cout << "Inner Cryostat Height: " << cryhheight - cryowall - vacgap << G4endl;
+  G4cout << "---------------------------" << G4endl;
+
+
   return fWorldPhysical;
 }
 
@@ -1455,6 +1507,14 @@ void WLGDDetectorConstruction::SetCryostatHeight(G4double height)
   G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
+// changing the height of the cryostat
+void WLGDDetectorConstruction::SetCryostatVacgap(G4double vacgap)
+{
+  fCryostatVacgap = vacgap;
+  WLGDDetectorConstruction::DefineMaterials();
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
 // option to remove the cupper tubes to see what impact it has on the production rate
 void WLGDDetectorConstruction::SetWithoutCupperTubes(G4int answer)
 {
@@ -1479,6 +1539,12 @@ void WLGDDetectorConstruction::SetMaterial(G4String answer)
   fSetMaterial = answer;
   WLGDDetectorConstruction::DefineMaterials();
   G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+// option to set the ZnS_Fraction of the Scitinllating Materials
+void WLGDDetectorConstruction::SetZnS_Fraction(G4double frac_ZnS)
+{
+  fFrac_ZnS = frac_ZnS;
 }
 
 // option to set the radius of the turbine structure
@@ -1608,6 +1674,14 @@ void WLGDDetectorConstruction::DefineCommands()
     .SetStates(G4State_PreInit)
     .SetToBeBroadcasted(false);
 
+  // changing the vacgap of the cryostat (distance between Outer Wall and Inner Wall)
+  fDetectorMessenger
+    ->DeclareMethod("Cryostat_Vacgap", &WLGDDetectorConstruction::SetCryostatVacgap)
+    .SetGuidance("Set the Vacgap of the cryostat [cm]")
+    .SetDefaultValue("50.0")
+    .SetStates(G4State_PreInit)
+    .SetToBeBroadcasted(false);
+
   // option to remove the cupper tubes to see what impact it has on the production rate
   fDetectorMessenger
     ->DeclareMethod("Without_Cupper_Tubes",
@@ -1640,9 +1714,22 @@ void WLGDDetectorConstruction::DefineCommands()
     .SetGuidance("BoratedPE = normal case")
     .SetGuidance("PolyEthylene = without Boron")
     .SetGuidance("PMMA = instead using PMMA")
-    .SetCandidates("BoratedPE PolyEthylene PMMA")
+    .SetGuidance("PVT = instead using PVT")
+    .SetGuidance("Styrene  = instead using Styrene")
+    .SetGuidance("ZnSStyrene  = instead using ZnSStyrene")
+    .SetGuidance("ZnSPVT  = instead using ZnSPVT")
+    .SetCandidates("BoratedPE PolyEthylene PMMA PVT Styrene ZnSStyrene ZnSPVT")
     .SetDefaultValue("BoratedPE");
 
+  // option to set the radius of the turbine structure
+  fDetectorMessenger
+    ->DeclareMethod("ZnS_Fraction",
+                    &WLGDDetectorConstruction::SetZnS_Fraction)
+    .SetGuidance("Set the fraction of ZnS on Scintillating materials")
+    .SetDefaultValue("0.05")
+    .SetToBeBroadcasted(false);
+  
+  
   // option to set the radius of the turbine structure
   fDetectorMessenger
     ->DeclareMethod("TurbineAndTube_Radius",

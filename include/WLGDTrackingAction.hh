@@ -25,6 +25,8 @@ private:
   double           tmp_neutronXpos, tmp_neutronYpos, tmp_neutronZpos;
   double           tmp_neutronXmom, tmp_neutronYmom, tmp_neutronZmom;
   double           tmp_neutronTime;
+  double           tmp_neutronEkin;
+  double           tmp_neutronID;
   double           tmp_MuonXpos, tmp_MuonYpos, tmp_MuonZpos;
   double           tmp_MuonXmom, tmp_MuonYmom, tmp_MuonZmom;
   WLGDEventAction* fEventAction;

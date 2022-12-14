@@ -27,6 +27,7 @@ public:
 
   // -- get geometry for turbine like structure (currently necessary for the particle generation inside the turbine structure)
   G4int    GetBoratedType() { return fWithBoratedPET; }
+  G4double GetZnsFraction() { return fFrac_ZnS; }
   G4double GetBoratedTurbineRadius() { return fBoratedTurbineRadius; }
   G4double GetBoratedTurbineLength() { return fBoratedTurbineLength; }
   G4double GetBoratedTurbineAngle() { return fBoratedTurbineAngle; }
@@ -54,13 +55,14 @@ public:
   // - select geometry of Neutron Moderators (options: 0: [no moderators], 1: around re-entrance tubes, 2: in turbine mode, 3: in large hollow tube mode)
   void  SetNeutronModerator(G4int answer);
 
-  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA)
+  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA, PVT, Styrene, ZnSStyrene, ZnSPVT)
   void  SetMaterial(G4String answer);
 
   // - w/wo Gd in the water (options: 0:[no], 1:yes)
   void  SetGdWater(G4int answer);
 
   // - setters to adjust the size and radius of the turbines and tubes (I know confusingly named)
+  void  SetZnS_Fraction(G4double frac_ZnS);
   void  SetTurbineAndTubeRadius(G4double radius);
   void  SetTurbineAndTubeLength(G4double length);
   void  SetTurbineAndTubeAngle(G4double deg);
@@ -76,6 +78,7 @@ public:
   // - set the size of the cryostat
   void  SetOuterCryostatRadius(G4double rad);
   void  SetCryostatHeight(G4double height);
+  void  SetCryostatVacgap(G4double vacgap);
   
   // - adjust between original simulation position of detectors or updates ones
   void  SetPositionOfDetectors(G4String name);
@@ -102,6 +105,8 @@ private:
   G4double                fHe3Conc                 = 0.0;
   G4double                fCryostatOuterRadius     = 350.0;
   G4double                fCryostatHeight          = 350.0;
+  G4double                fCryostatVacgap          = 50.0;
+  G4double                fFrac_ZnS                = 0.05;
   G4double                fBoratedTurbineRadius    = 200.0;
   G4double                fBoratedTurbineLength    = 50.0;
   G4double                fBoratedTurbineAngle     = 45.0;
