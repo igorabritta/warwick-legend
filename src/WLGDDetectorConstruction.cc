@@ -141,14 +141,23 @@ void WLGDDetectorConstruction::DefineMaterials()
 
   // ZnS-Styrene
   double   frac_ZnS = fFrac_ZnS;
-  auto* ZnSStyrene  = new G4Material("ZnSStyrene", 0.909 * g / cm3, 2);
+
+  double   frac_density_ZnS = ((4.090*frac_ZnS) + 0.909*(1-frac_ZnS));
+  auto* ZnSStyrene  = new G4Material("ZnSStyrene", frac_density_ZnS * g / cm3, 2);
   ZnSStyrene ->AddMaterial(Styrene, 1-frac_ZnS);
   ZnSStyrene ->AddMaterial(ZnS, frac_ZnS);
 
   // ZnS-PVT
-  auto* ZnSPVT  = new G4Material("ZnSPVT", 1.023 * g / cm3, 2);
+  double   frac_density_ZnPVT = ((4.090*frac_ZnS) + 1.023*(1-frac_ZnS));
+  auto* ZnSPVT  = new G4Material("ZnSPVT", frac_density_ZnPVT * g / cm3, 2);
   ZnSPVT ->AddMaterial(PVT, 1-frac_ZnS);
   ZnSPVT ->AddMaterial(ZnS, frac_ZnS);
+
+  // ZnS-PMMA
+  double   frac_density_ZnPMMA = ((4.090*frac_ZnS) + 1.18*(1-frac_ZnS));
+  auto* ZnSPMMA  = new G4Material("ZnSPMMA", frac_density_ZnPMMA * g / cm3, 2);
+  ZnSPMMA ->AddMaterial(PMMA, 1-frac_ZnS);
+  ZnSPMMA ->AddMaterial(ZnS, frac_ZnS);
 
   G4Element* elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * g / mole);
   G4Element* elS  = new G4Element("Sulfur", "S", 16., 32.066 * g / mole);
@@ -589,7 +598,9 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
   if(fSetMaterial == "ZnSStyrene")
     BoratedPETMat = G4Material::GetMaterial("ZnSStyrene");
   if(fSetMaterial == "ZnSPVT")
-    BoratedPETMat = G4Material::GetMaterial("PVT");
+    BoratedPETMat = G4Material::GetMaterial("ZnSPVT");
+  if(fSetMaterial == "ZnSPMMA")
+    BoratedPETMat = G4Material::GetMaterial("ZnSPMMA");
   auto* larMat /*_alt*/ = G4Material::GetMaterial("CombinedArXeHe3");
   // if(fXeConc != 0 || fHe3Conc != 0) BoratedPET
   larMat = CombinedArXeHe3;
@@ -1718,7 +1729,8 @@ void WLGDDetectorConstruction::DefineCommands()
     .SetGuidance("Styrene  = instead using Styrene")
     .SetGuidance("ZnSStyrene  = instead using ZnSStyrene")
     .SetGuidance("ZnSPVT  = instead using ZnSPVT")
-    .SetCandidates("BoratedPE PolyEthylene PMMA PVT Styrene ZnSStyrene ZnSPVT")
+    .SetGuidance("ZnSPMMA  = instead using ZnSPMMA")
+    .SetCandidates("BoratedPE PolyEthylene PMMA PVT Styrene ZnSStyrene ZnSPVT ZnSPMMA")
     .SetDefaultValue("BoratedPE");
 
   // option to set the radius of the turbine structure

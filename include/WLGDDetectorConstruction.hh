@@ -55,7 +55,7 @@ public:
   // - select geometry of Neutron Moderators (options: 0: [no moderators], 1: around re-entrance tubes, 2: in turbine mode, 3: in large hollow tube mode)
   void  SetNeutronModerator(G4int answer);
 
-  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA, PVT, Styrene, ZnSStyrene, ZnSPVT)
+  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA, PVT, Styrene, ZnSStyrene, ZnSPVT, ZnSPMMA)
   void  SetMaterial(G4String answer);
 
   // - w/wo Gd in the water (options: 0:[no], 1:yes)
