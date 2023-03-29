@@ -140,7 +140,7 @@ void WLGDDetectorConstruction::DefineMaterials()
   Styrene ->AddElement(C, 0.922586039);
 
   // ZnS-Styrene
-  double   frac_ZnS = fFrac_ZnS;
+  G4double   frac_ZnS = fFrac_ZnS;
 
   double   frac_density_ZnS = ((4.090*frac_ZnS) + 0.909*(1-frac_ZnS));
   auto* ZnSStyrene  = new G4Material("ZnSStyrene", frac_density_ZnS * g / cm3, 2);
@@ -158,6 +158,18 @@ void WLGDDetectorConstruction::DefineMaterials()
   auto* ZnSPMMA  = new G4Material("ZnSPMMA", frac_density_ZnPMMA * g / cm3, 2);
   ZnSPMMA ->AddMaterial(PMMA, 1-frac_ZnS);
   ZnSPMMA ->AddMaterial(ZnS, frac_ZnS);
+
+  // TO BE REMOVED - JUST A TEST
+  G4cout << "Doped Parameters: "          << G4endl;
+  G4cout << "Fraction of ZnS: "           << frac_ZnS << G4endl;
+  G4cout << "Fraction Plastic Material: " << (1 - frac_ZnS) << G4endl;
+  G4cout << "Density DpPMMA: "            << (frac_density_ZnPMMA) << G4endl;
+  G4cout << "Density DpPVT: "             << frac_density_ZnPVT << G4endl;
+  G4cout << "Density DpStyrene: "         << frac_density_ZnS << G4endl;
+  G4cout << "---------------------------" << G4endl;
+
+
+
 
   G4Element* elGd = new G4Element("Gadolinium", "Gd", 64, 157.25 * g / mole);
   G4Element* elS  = new G4Element("Sulfur", "S", 16., 32.066 * g / mole);
@@ -595,6 +607,8 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
     BoratedPETMat = G4Material::GetMaterial("PVT");
   if(fSetMaterial == "Styrene")
     BoratedPETMat = G4Material::GetMaterial("Styrene");
+  if(fSetMaterial == "ZnS")
+    BoratedPETMat = G4Material::GetMaterial("ZnS");
   if(fSetMaterial == "ZnSStyrene")
     BoratedPETMat = G4Material::GetMaterial("ZnSStyrene");
   if(fSetMaterial == "ZnSPVT")
@@ -1556,6 +1570,9 @@ void WLGDDetectorConstruction::SetMaterial(G4String answer)
 void WLGDDetectorConstruction::SetZnS_Fraction(G4double frac_ZnS)
 {
   fFrac_ZnS = frac_ZnS;
+  G4cout << "(teste)Fraction of ZnS: "           << fFrac_ZnS << G4endl;
+  WLGDDetectorConstruction::DefineMaterials();
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
 // option to set the radius of the turbine structure
@@ -1727,18 +1744,20 @@ void WLGDDetectorConstruction::DefineCommands()
     .SetGuidance("PMMA = instead using PMMA")
     .SetGuidance("PVT = instead using PVT")
     .SetGuidance("Styrene  = instead using Styrene")
+    .SetGuidance("ZnS  = instead using ZnS")
     .SetGuidance("ZnSStyrene  = instead using ZnSStyrene")
     .SetGuidance("ZnSPVT  = instead using ZnSPVT")
     .SetGuidance("ZnSPMMA  = instead using ZnSPMMA")
-    .SetCandidates("BoratedPE PolyEthylene PMMA PVT Styrene ZnSStyrene ZnSPVT ZnSPMMA")
+    .SetCandidates("BoratedPE PolyEthylene PMMA PVT Styrene ZnS ZnSStyrene ZnSPVT ZnSPMMA")
     .SetDefaultValue("BoratedPE");
 
-  // option to set the radius of the turbine structure
+  // option to set the ZnS Fraction on the Moderator materials
   fDetectorMessenger
     ->DeclareMethod("ZnS_Fraction",
                     &WLGDDetectorConstruction::SetZnS_Fraction)
     .SetGuidance("Set the fraction of ZnS on Scintillating materials")
     .SetDefaultValue("0.05")
+    .SetStates(G4State_PreInit)
     .SetToBeBroadcasted(false);
   
   

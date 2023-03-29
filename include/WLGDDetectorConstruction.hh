@@ -55,7 +55,7 @@ public:
   // - select geometry of Neutron Moderators (options: 0: [no moderators], 1: around re-entrance tubes, 2: in turbine mode, 3: in large hollow tube mode)
   void  SetNeutronModerator(G4int answer);
 
-  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA, PVT, Styrene, ZnSStyrene, ZnSPVT, ZnSPMMA)
+  // - what material should the moderators be made of (options: [BoratedPE], PolyEthylene, PMMA, PVT, Styrene, ZnS, ZnSStyrene, ZnSPVT, ZnSPMMA)
   void  SetMaterial(G4String answer);
 
   // - w/wo Gd in the water (options: 0:[no], 1:yes)
@@ -106,7 +106,7 @@ private:
   G4double                fCryostatOuterRadius     = 350.0;
   G4double                fCryostatHeight          = 350.0;
   G4double                fCryostatVacgap          = 50.0;
-  G4double                fFrac_ZnS                = 0.05;
+  G4double                fFrac_ZnS                = 0.10;
   G4double                fBoratedTurbineRadius    = 200.0;
   G4double                fBoratedTurbineLength    = 50.0;
   G4double                fBoratedTurbineAngle     = 45.0;
