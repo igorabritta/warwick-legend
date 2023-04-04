@@ -20,8 +20,8 @@ void WLGDTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
   }
 
   // add Ge77 events to ListOfGe77
-  if(aTrack->GetParticleDefinition()->GetAtomicMass() == 77 &&
-     aTrack->GetParticleDefinition()->GetPDGCharge() == 32)
+  if(aTrack->GetParticleDefinition()->GetAtomicMass() == 42 &&
+     aTrack->GetParticleDefinition()->GetPDGCharge() == 19)
   {
     fEventAction->AddIDListOfGe77(aTrack->GetTrackID());
   }
@@ -168,6 +168,24 @@ void WLGDTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
          abs(aTrack->GetStep()->GetSecondaryInCurrentStep()->at(i)->GetTotalEnergy() /
                eV -
              160e3) < 1e3)
+        fEventAction->SetisIC(1);
+    }
+  }
+    
+    
+  // For 42K readout
+  if(aTrack->GetParticleDefinition()->GetPDGEncoding() == 1000190420)
+  {
+    fEventAction->SetisMetastable(0);
+      
+    int NumberOfSecundaries = aTrack->GetStep()->GetSecondaryInCurrentStep()->size();
+    for(int i = 0; i < NumberOfSecundaries; i++)
+    {
+      if(aTrack->GetStep()
+             ->GetSecondaryInCurrentStep()
+             ->at(i)
+             ->GetParticleDefinition()
+             ->GetParticleName() == "gamma")
         fEventAction->SetisIC(1);
     }
   }

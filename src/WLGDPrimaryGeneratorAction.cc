@@ -186,7 +186,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     fParticleGun->GeneratePrimaryVertex(event);
   }
-  if(fGenerator == "Ge77m" || fGenerator == "Ge77andGe77m")
+  if(fGenerator == "Ge77m" || fGenerator == "Ge77andGe77m" || fGenerator == "42K")
   {
     G4double cushift        = 150.;
     G4double roiradius      = 30.0;  // string radius curad - Ge radius - gap
@@ -236,13 +236,9 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4double energy        = 0 * GeV;
     G4double theta         = 0 * rad;
     G4double phi           = 0 * rad;
-    G4double x =
-      radius * cos(ṕhi) + roiradius * cm * std::cos(string_number * angle) + offset_x;
-    G4double y =
-      radius * sin(ṕhi) + roiradius * cm * std::sin(string_number * angle) + offset_y;
-    G4double z = cushift * cm - step +
-                 (nofLayers / 2 * layerthickness - z_number * layerthickness) * cm +
-                 gehheight * cm * (1 - 2 * rndm(generator));
+    G4double x =      radius * cos(ṕhi) + roiradius * cm * std::cos(string_number * angle) + offset_x;
+    G4double y =      radius * sin(ṕhi) + roiradius * cm * std::sin(string_number * angle) + offset_y;
+    G4double z =      cushift * cm - step + (nofLayers / 2 * layerthickness - z_number * layerthickness) * cm + gehheight * cm * (1 - 2 * rndm(generator));
 
     //   G4cout << "Primary coordinates: " << position/m << " m" << G4endl;
     //   G4cout << "Primary coordinates: " << x/cm << " " <<  y/cm << " " << z/cm << " "
@@ -275,6 +271,14 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         theParticleTable->GetIonTable()->GetIon(32, 77, 159.71 * keV));
       theMass = theParticleTable->GetIonTable()->GetIonMass(32, 77, 0, 1);
     }
+    
+    if(fGenerator == "42K")
+    {
+      fParticleGun->SetParticleDefinition(
+        theParticleTable->GetIonTable()->GetIon(19, 42, 0 * keV));
+      theMass = theParticleTable->GetIonTable()->GetIonMass(19, 42, 0, 1);
+    }
+      
     G4double      totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);
     G4double      pz          = -1 * std::cos(theta);
     G4double      px          = std::sin(theta) * cos(phi);
@@ -285,9 +289,56 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     fParticleGun->SetParticleEnergy(energy);
 
-    fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+    if(fGenerator == "42K")
+    {
+        //G4cout << "Pippo 1" << G4endl;
+        generator.seed(rd());  // set a random seed
+        
+        G4double gen1  = rndm(generator);
+        
+        G4cout << "Gen 1: " << gen1 << G4endl;
+        
+        G4double radiusLAr  = 68.75 * cm * gen1;
+        
+        G4cout << "Radius LAr: " << radiusLAr << G4endl;
+        
+        generator.seed(rd());  // set a random seed
+        G4double theta1           = CLHEP::twopi * rndm(generator);
+        //G4double phi1             = (CLHEP::pi * rndm(generator)) - (CLHEP::pi/2);
+
+        G4double x1 = radiusLAr * cos(theta1);
+        G4double y1 = radiusLAr * sin(theta1);
+        G4double z1 = (300 * cm * rndm(generator)) - (150 * cm);
+
+        G4cout << "Z LAr: " << z1 << G4endl;
+        
+        fParticleGun->SetParticlePosition(G4ThreeVector(x1, y1, z1));
+    }
+    else
+    {
+        fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
+    }
 
     fParticleGun->GeneratePrimaryVertex(event);
+      
+    
+      
+    //std::uniform_real_distribution<> rndm(0.0, 1.0);   // azimuth angle
+    //G4double phi    = CLHEP::twopi * rndm(generator);  // random uniform number
+    
+    //std::uniform_real_distribution<> rndm(0.0, 1.0);   // azimuth angle
+    //G4double theta  = CLHEP::pi * rndm(generator);  // random uniform number
+         
+    //G4double      totMomentum = std::sqrt(energy * energy + 2 * theMass * energy);
+    //G4double      pz          = -1 * std::cos(theta);
+    //G4double      px          = std::sin(theta) * cos(phi);
+    //G4double      py          = std::sin(theta) * sin(phi);
+    //G4ThreeVector momentumDir(px, py, pz);
+
+    //fParticleGun->SetParticleMomentumDirection(momentumDir);
+
+    //fParticleGun->SetParticleEnergy(energy);      
+      
   }
   if(fGenerator == "ModeratorNeutrons")
   {
@@ -556,7 +607,7 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 void WLGDPrimaryGeneratorAction::SetGenerator(const G4String& name)
 {
   std::set<G4String> knownGenerators = {
-    "MeiAndHume",        "Musun",           "Ge77m", "Ge77andGe77m",
+    "MeiAndHume",        "Musun",           "Ge77m", "42K", "Ge77andGe77m",
     "ModeratorNeutrons", "ExternalNeutrons"
   };
   if(knownGenerators.count(name) == 0)
@@ -604,9 +655,10 @@ void WLGDPrimaryGeneratorAction::DefineCommands()
     .SetGuidance("MeiAndHume = WW standard case")
     .SetGuidance("Musun = Used in previous MaGe simulation")
     .SetGuidance("Ge77m = generate Ge77m inside the HPGe detectors")
+    .SetGuidance("42K = generate 42K inside the RTubes")
     .SetGuidance("Ge77andGe77m = generate 50% Ge77, 50% Ge77m inside the HPGe detectors")
     .SetGuidance("ModeratorNeutrons = generate neutrons inside the neutron moderators")
     .SetGuidance("ExternalNeutrons = generate neutrons from outside the water tank")
     .SetCandidates(
-      "MeiAndHume Musun Ge77m Ge77andGe77m ModeratorNeutrons ExternalNeutrons");
+      "MeiAndHume Musun Ge77m 42K Ge77andGe77m ModeratorNeutrons ExternalNeutrons");
 }
