@@ -11,6 +11,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
+
 // std
 #include <fstream>
 #include <random>
@@ -18,6 +19,7 @@
 /*#include "TH1F.h"
 #include "TFile.h"*/
 //#include "TH1.h"
+#include<cmath>
 
 // G4String WLGDPrimaryGeneratorAction::fFileName;
 // std::ifstream* WLGDPrimaryGeneratorAction::fInputFile;
@@ -296,21 +298,26 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         
         G4double gen1  = rndm(generator);
         
-        G4cout << "Gen 1: " << gen1 << G4endl;
+        //G4cout << "Gen 1: " << gen1 << G4endl;
         
-        G4double radiusLAr  = 68.75 * cm * gen1;
+        G4double radiusLAr  = pow(687.5,2) * gen1;
         
-        G4cout << "Radius LAr: " << radiusLAr << G4endl;
+        //G4cout << "Radius LAr: " << radiusLAr << G4endl;
         
         generator.seed(rd());  // set a random seed
         G4double theta1           = CLHEP::twopi * rndm(generator);
+
+        //G4cout << "Theta: " << theta1 << G4endl;
         //G4double phi1             = (CLHEP::pi * rndm(generator)) - (CLHEP::pi/2);
 
-        G4double x1 = radiusLAr * cos(theta1);
-        G4double y1 = radiusLAr * sin(theta1);
-        G4double z1 = (300 * cm * rndm(generator)) - (150 * cm);
+        G4double x1 = sqrt(radiusLAr) * cos(theta1);
+        G4double y1 = sqrt(radiusLAr) * sin(theta1);
+        G4double z1 = (3000 * rndm(generator)) - (1500);
 
+	G4cout << "X LAr: " << x1 << G4endl;
+	G4cout << "Y LAr: " << y1 << G4endl;
         G4cout << "Z LAr: " << z1 << G4endl;
+	G4cout << "------------------------ " << G4endl;
         
         fParticleGun->SetParticlePosition(G4ThreeVector(x1, y1, z1));
     }
