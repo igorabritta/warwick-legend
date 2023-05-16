@@ -173,7 +173,7 @@ Macros to controll the detector geometry
   - Without_Cupper_Tubes
   - With_Gd_Water
   - With_NeutronModerators (options: 0: [no moderators], 1: around re-entrance tubes, 2: in turbine mode, 3: in large hollow tube mode)
-  - Which_Material (options: [BoratedPE], PolyEthylene, PMMA)
+  - Which_Material (options: [BoratedPE], PolyEthylene, PVT, Styrene)
   - TurbineAndTube
     - Radius
     - Width

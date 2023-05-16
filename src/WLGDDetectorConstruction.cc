@@ -675,7 +675,7 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
   }
   if(fGeometryName == "baseline_large_reentrance_tube" || fGeometryName == "baseline_large_reentrance_tube_4m_cryo")
   {
-    curad     = 95.0;  
+    curad     = 70.0; //95.0;  
   }
   G4double ringrad = 100.0;  // cu tube placement ring radius
   // Ge cylinder 2.67 kg at 5.32 g/cm3
@@ -687,8 +687,8 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
   G4double layerthickness = gegap + 2 * gehheight;  // 13 cm total
   //    G4int nofLayers = 8;   // 8 Ge + 7 gaps = 1010 mm string height
   //    G4int nofStrings = 12;  // 12 strings  of 8 Ge each
-  G4int nofLayers  = 7;   // 8 Ge + 7 gaps = 1010 mm string height
-  G4int nofStrings = 14;  // 12 strings  of 8 Ge each
+  G4int nofLayers  = 0;//7;   // 8 Ge + 7 gaps = 1010 mm string height
+  G4int nofStrings = 0;//14;  // 12 strings  of 8 Ge each
 
   fvertexZ = (hallhheight + offset) * cm;
   fmaxrad  = hallrad * cm;
@@ -819,8 +819,11 @@ auto WLGDDetectorConstruction::SetupBaseline() -> G4VPhysicalVolume*
 
   //
   // copper tubes, hollow cylinder shell
+  //auto* copperSolid = new G4Tubs("Copper", (curad - copper) * cm, curad * cm,
+  //                               cuhheight * cm, 0.0, CLHEP::twopi);
+  // RT dimensions for 42K sim
   auto* copperSolid = new G4Tubs("Copper", (curad - copper) * cm, curad * cm,
-                                 cuhheight * cm, 0.0, CLHEP::twopi);
+                                 90.0 * cm, 0.0, CLHEP::twopi);
   //
   // ULAr bath, solid cylinder
   auto* ularSolid = new G4Tubs("ULar", 0.0 * cm, (curad - copper) * cm,

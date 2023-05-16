@@ -312,12 +312,13 @@ void WLGDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
         G4double x1 = sqrt(radiusLAr) * cos(theta1);
         G4double y1 = sqrt(radiusLAr) * sin(theta1);
-        G4double z1 = (3000 * rndm(generator)) - (1500);
+        //G4double z1 = (3000 * rndm(generator)) - (1500);
+        G4double z1 = (1800 * rndm(generator)) - (900); // Dimensions = to RT
 
-	G4cout << "X LAr: " << x1 << G4endl;
-	G4cout << "Y LAr: " << y1 << G4endl;
+        G4cout << "X LAr: " << x1 << G4endl;
+        G4cout << "Y LAr: " << y1 << G4endl;
         G4cout << "Z LAr: " << z1 << G4endl;
-	G4cout << "------------------------ " << G4endl;
+        G4cout << "------------------------ " << G4endl;
         
         fParticleGun->SetParticlePosition(G4ThreeVector(x1, y1, z1));
     }
